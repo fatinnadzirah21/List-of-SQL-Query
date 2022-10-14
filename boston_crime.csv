@@ -1,0 +1,23 @@
+#with boston_crime.csv dataset
+
+SELECT
+  *
+FROM
+  boston.crime
+WHERE
+  OFFENSE_DESCRIPTION LIKE "ASSAULT%"
+
+
+SELECT
+  OFFENSE_CODE
+FROM 
+  boston.crime
+GROUP BY
+  OFFENSE_CODE;
+
+
+
+SELECT
+  *, CAST(OCCURRED_ON_DATE AS time) AS TIME
+FROM
+  boston.crime
