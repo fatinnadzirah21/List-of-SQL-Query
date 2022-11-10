@@ -1,0 +1,184 @@
+SELECT title FROM movies LIMIT 5
+#expected output: a table with a single column for the title of 5 movies.
+
+SELECT title FROM movies ORDER BY title ASC LIMIT 10
+#expected output: a table with a single column containing top 10 alphabetically sorted movie title list
+
+SELECT title FROM movies ORDER BY title ASC, year DESC LIMIT 10
+#expected output: a table with a single column containing top 10 alphabetically sorted movie title list but in reverse chronology
+
+SELECT DISTINCT name FROM people ORDER BY name ASC LIMIT 10
+#expected output: a table with a single column containing 10 sorted unique name list
+
+SELECT title FROM movies WHERE year=1990
+#expected output: list of titles of all movies released in 1990
+
+
+SELECT name, birth FROM people WHERE name='Benedict Cumberbatch'
+#expected output: birth year of Benedict Cumberbatch
+
+
+SELECT title FROM movies WHERE year>=2000 ORDER BY title ASC
+#expected output: all movies with a release date on or after 2000, in alphabetical order
+
+
+SELECT COUNT(*) AS number_of_movies FROM ratings WHERE rating>9.8
+#expected output: the number of movies with an IMDb rating > 9.8
+
+
+SELECT title, year FROM movies 
+WHERE title LIKE 'Captain America%'
+ORDER BY title ASC
+#expected output: a list of the titles and release years of all Captain America movies, in chronological order
+
+
+SELECT id AS movie_id FROM movies
+WHERE id IN (
+	SELECT movie_id FROM directors
+	WHERE person_id = (
+		SELECT id FROM people 
+		WHERE name = 'Joris Ivens'
+		)
+	)
+#OR
+  WITH
+director_id AS
+(
+	SELECT id FROM people
+	WHERE name = 'Joris Ivens'
+),
+director_movie AS
+(
+	SELECT movie_id FROM directors
+	WHERE person_id = (SELECT id FROM director_id)
+)
+SELECT id AS movie_id FROM movies
+WHERE id IN (SELECT movie_id FROM director_movie)
+#expected output: movie ID directed by Joris Ivens
+
+
+SELECT title AS movie_title FROM movies
+WHERE id IN (
+	SELECT movie_id FROM directors
+	WHERE person_id = (
+		SELECT id FROM people 
+		WHERE name = 'Joris Ivens'
+		)
+	)
+#expected output: movie title directed by Joris Ivens
+
+
+SELECT
+	name,
+	CASE
+		WHEN birth<1970 THEN 'born before 1970'
+		WHEN birth=1970 THEN 'born in 1970'
+		ELSE 'born after 1970'
+	END AS birth_period
+FROM people
+#expected output: every person who is born before, in, and after 1970
+
+
+SELECT
+	COUNT(*) AS number_of_people,
+	birth AS birth_year
+FROM people
+GROUP BY birth
+#expected output: total number of people by each birth year
+
+
+SELECT 
+	COUNT(*) as number_of_directors, 
+	birth AS birth_year
+FROM people
+WHERE id IN (
+	SELECT person_id FROM directors
+	)
+GROUP BY birth
+HAVING COUNT(*) > 500
+#expected output: total number of directors by each birth year after the year 500
+
+
+SELECT AVG(rating) AS average_rating
+FROM
+	movies JOIN ratings
+		ON movies.id = ratings.movie_id
+WHERE year = 1998
+#expected output: the average rating of all movies released in 1998
+
+
+SELECT title, rating
+FROM
+	movies JOIN ratings
+		ON movies.id = ratings.movie_id
+WHERE year = 2002
+ORDER BY rating DESC, title ASC
+#expected output: all movies released in 2002 and their ratings, in descending order by rating and alphabetically by title
+
+
+SELECT name
+FROM
+	(movies JOIN stars
+		ON movies.id = stars.movie_id) a
+			JOIN people ON people.id = a.person_id
+WHERE title = "The Lord of the Rings"
+#expected output: the names of all people who starred in “The Lord of the Rings”
+
+
+SELECT DISTINCT name
+FROM
+	(movies JOIN stars
+		ON movies.id = stars.movie_id) a
+			JOIN people ON people.id = a.person_id
+WHERE year = 2010
+ORDER BY birth ASC
+#expected output: names of all people who starred in a movie released in 2010, ordered by birth year in ascending order
+
+
+SELECT name
+FROM
+	(ratings JOIN directors
+		ON ratings.movie_id = directors.movie_id) a
+			JOIN people ON people.id = a.person_id
+WHERE rating>8.5
+#expected output: names of all people who have directed a movie that received a rating > 8.5
+
+
+SELECT title
+FROM
+	(people JOIN stars
+		ON people.id = stars.person_id) a
+			JOIN movies ON movies.id = a.movie_id
+			JOIN ratings ON ratings.movie_id = a.movie_id
+WHERE name = "Leonardo DiCaprio"
+ORDER BY rating DESC LIMIT 5
+#expected output: list of the titles of the five highest rated movies (in order) that Leonardo DiCaprio starred in, starting with the highest rated
+
+
+CREATE TABLE actors (
+	movie_id INTEGER,
+	person_id INTEGER
+)
+#expected output: create a table “actors” which has two columns - movie_id, person_id
+
+
+INSERT INTO actors
+(movie_id, person_id)
+VALUES
+(120338, 138)
+#expected output: insert the movie_id of “Titanic” and person_id of “Leonardo DiCaprio” into the “actors” table, in one row
+
+
+UPDATE actors
+SET movie_id = 120533
+WHERE person_id = 138
+#expected output: update the record input on exercise 2 into the movie_id of the movie “Celebrity”
+
+
+ALTER TABLE actors
+RENAME TO movie_actors
+#expected output: change the table name of “actors” into “movie_actors”
+
+
+DROP TABLE movie_actors
+#expected output: delete the “actors” table on the movie database
