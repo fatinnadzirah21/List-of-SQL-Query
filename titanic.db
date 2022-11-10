@@ -1,0 +1,29 @@
+SELECT count(*) as total_passengers_survived
+FROM passengers
+WHERE
+  Age is not NULL
+  AND
+  Survived = 1
+
+SELECT count(*) AS children_elderlies_survived
+FROM passengers
+WHERE
+  Age is not NULL
+  AND
+  Survived = 1
+  AND
+  Age<=18 OR Age>=65
+
+SELECT
+  Sex,
+  count(*) AS total_survivors,
+  sum(Survived) * 100 / CAST(count(*) AS FLOAT) AS survival_rate
+FROM passengers
+GROUP BY Sex
+
+SELECT
+  Pclass,
+  count(*) AS total_passengers,
+  sum(Survived) * 100 / CAST(count(*) as FLOAT) as survival_rate
+FROM passengers
+GROUP BY Pclass
